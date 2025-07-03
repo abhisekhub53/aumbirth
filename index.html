@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday Aum!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+    .photo {
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid #ff4081;
+      box-shadow: 0 10px 30px rgba(255, 64, 129, 0.5);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    h1 {
+      color: #ff4081;
+      font-family: 'Pacifico', cursive;
+      font-size: 3em;
+      margin: 20px 0 10px;
+    }
+    #typewriter {
+      color: #fff;
+      font-size: 1.3em;
+      min-height: 60px;
+      margin-bottom: 20px;
+    }
+    .cake {
+      width: 200px;
+      margin-top: 20px;
+      border-radius: 20px;
+      animation: floatCake 3s ease-in-out infinite;
+    }
+    @keyframes floatCake {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .btn {
+      margin-top: 30px;
+      padding: 12px 25px;
+      background: #ff4081;
+      color: white;
+      font-size: 1.2em;
+      font-weight: bold;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255,64,129,0.5);
+      transition: background 0.3s, transform 0.3s;
+    }
+    .btn:hover {
+      background: #e91e63;
+      transform: scale(1.05);
+    }
+    .balloon {
+      position: absolute;
+      width: 40px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: red;
+      opacity: 0.6;
+      animation: floatUp 10s linear infinite;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh); }
+      100% { transform: translateY(-120vh); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks"></canvas>
+
+  <div class="container">
+    <img src="aum.png" alt="Friend" class="photo">
+    <h1>Let’s Make Some Noise for Aum Bro! 🎉</h1>
+    <div id="typewriter"></div>
+    <img src="aum cake.png" alt="Birthday Cake" class="cake">
+    <button class="btn" onclick="celebrate()">🎇 Celebrate Again 🎇</button>
+  </div>
+
+  <audio id="birthdayMusic" autoplay loop>
+    <source src="abirthday.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+    const message = "Happy Birthday Aum🥳🎉🍾, it's your day to shine like a disco ball! 🎉 May your group chats be active for once, your crush accidentally like your old pic, and your cake survive your squad! 😂🎂📸";
+    let i = 0;
+    function typeWriter() {
+      if (i < message.length) {
+        document.getElementById("typewriter").innerHTML += message.charAt(i);
+        i++;
+        setTimeout(typeWriter, 50);
+      }
+    }
+    typeWriter();
+
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let fireworks = [];
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createFirework(x = random(100, canvas.width - 100), y = random(50, canvas.height / 2)) {
+      const hue = random(0, 360);
+      const color = `hsl(${hue}, 100%, 60%)`;
+      for (let i = 0; i < 50; i++) {
+        fireworks.push({
+          x,
+          y,
+          angle: (Math.PI * 2 * i) / 50,
+          speed: random(2, 6),
+          alpha: 1,
+          color
+        });
+      }
+    }
+
+    function updateFireworks() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fireworks.forEach((f, i) => {
+        f.x += Math.cos(f.angle) * f.speed;
+        f.y += Math.sin(f.angle) * f.speed;
+        f.alpha -= 0.01;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = f.color.replace("hsl", "hsla").replace(")", `, ${f.alpha})`);
+        ctx.fill();
+        if (f.alpha <= 0) fireworks.splice(i, 1);
+      });
+    }
+
+    function animate() {
+      updateFireworks();
+      requestAnimationFrame(animate);
+    }
+
+    function celebrate() {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => createFirework(), i * 300);
+      }
+    }
+
+    setInterval(() => createFirework(), 1500);
+    animate();
+
+    for (let i = 0; i < 20; i++) {
+      const balloon = document.createElement('div');
+      balloon.className = 'balloon';
+      balloon.style.left = `${Math.random() * 100}vw`;
+      balloon.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+      balloon.style.animationDuration = `${6 + Math.random() * 5}s`;
+      document.body.appendChild(balloon);
+    }
+
+    const music = document.getElementById("birthdayMusic");
+    music.play().catch(() => {
+      document.body.addEventListener("click", () => music.play(), { once: true });
+    });
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
